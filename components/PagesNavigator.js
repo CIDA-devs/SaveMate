@@ -19,6 +19,7 @@ import {
   SimpleLineIcons,
   FontAwesome5
 } from "@expo/vector-icons";
+import MainContentData from './MainContentData';
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -43,8 +44,8 @@ export function MyBottomTabs() {
   return (
     <Tab.Navigator>
       <Tab.Screen
-        name="Home"
-        component={Home}
+        name="MainContentData"
+        component={MainContentData}
         options={{
           title: "",
           // headerShown: false,
@@ -112,7 +113,7 @@ export function MyBottomTabs() {
           },
           tabBarIcon: () => {
             return (
-              <Ionicons name="ios-home-outline" size={24} color="dodgerblue" />
+              <Feather name="credit-card" size={24} color="dodgerblue" />
             );
           },
         }}
@@ -154,7 +155,7 @@ export function MyBottomTabs() {
             );
           },
           tabBarIcon: () => {
-            return <AntDesign name="folderopen" size={24} color="dodgerblue" />;
+            return <AntDesign name="pluscircleo" size={24} color="dodgerblue" />;
           },
         }}
       />
@@ -164,7 +165,7 @@ export function MyBottomTabs() {
         options={{
           tabBarIcon: () => {
             return (
-              <Ionicons name="person-outline" size={24} color="dodgerblue" />
+              <Feather name="book-open" size={24} color="dodgerblue" />
             );
           },
         }}
@@ -220,11 +221,11 @@ function PagesNavigator() {
 
     // <NavigationContainer>
     <Tab.Navigator>
-      <Tab.Screen
+      {/* <Tab.Screen
         name="Home"
         component={Home}
         // ... Other options
-      />
+      /> */}
       <Tab.Screen
         name="Notifications"
         component={Notifications}

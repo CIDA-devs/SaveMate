@@ -5,87 +5,151 @@ import {
   Text,
   ScrollView,
   TouchableOpacity,
-  Image
+  Image,
 } from "react-native";
-import { Fontisto } from "@expo/vector-icons";
+import { useFonts } from 'expo-font';
 import Swiper from "react-native-swiper";
-// import { Image } from "react-native";
-// import fill from "../assets/images/swiperImage/blank.gif";
 import { useNavigation } from "@react-navigation/native";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
-// import Options from "./Options";
+import itemtwo from "../assets/itemtwo.jpg";
+import itemone from "../assets/wallpaper1.jpg";
 
 const MainContentData = () => {
 
-  const amount = 300
+
+  const [fontsLoaded] = useFonts({
+    'Poppins': require('../assets/PoppinsFont/Poppins-Medium.ttf'),
+  });
+
+  if (!fontsLoaded) {
+    return null;
+  }
+
+  const amount = 300;
   const navigation = useNavigation();
   return (
     <ScrollView>
-      <View style={{ flex: 1,marginHorizontal:20,marginTop:20 }}>
+      <View style={{ flex: 1, marginHorizontal: 20, marginTop: 20 }}>
         {/* <Options/> */}
 
         <View style={styles.detailsBox}>
           <Text style={styles.title}>Savings Balance</Text>
           <Text style={styles.amount}> GH₵ {amount}.00</Text>
-         <View style={styles.btn_div}>
-          <TouchableOpacity style={styles.deposit}>
-            <Text style={styles.deposit_text}>Deposit</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.withdraw}>
-            <Text style={styles.withdraw_text}>Withdraw</Text>
-          </TouchableOpacity>
-         </View>
-        </View>
-<View>
-        <Text style={{textAlign:"center",marginTop: 10,marginBottom: 20, fontSize:16,fontWeight: "bold"}}>Make a dream purchase a reality</Text>
-        <View
-          style={{
-            flexDirection: "row",
-            justifyContent: "center",
-          }}
-        >
-          <Swiper
-            showsButtons={false}
-            showsPagination={false}
-            style={{ height: 316 }}
-            loop={true}
-            autoplay={true}
-            // slidesPerView={2}
-            >
-            <TouchableOpacity
-              style={{ alignItems: "center", overflow: "hidden" }}
-              // onPress={() => {
-              //   navigation.navigate("FillInTheBlanks");
-              // }}
-            >
-              <View style={styles.challenges}>
-               <Image source={itemone}/>
-              </View>
+          <View style={styles.btn_div}>
+            <TouchableOpacity style={styles.deposit}>
+              <Text style={styles.deposit_text}>Deposit</Text>
             </TouchableOpacity>
-            <TouchableOpacity
-              style={{ alignItems: "center", overflow: "hidden" }}
-              // onPress={() => {
-              //   navigation.navigate("FillInTheBlanks");
-              // }}
+            <TouchableOpacity style={styles.withdraw}>
+              <Text style={styles.withdraw_text}>Withdraw</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+        <View>
+          <Text
+            style={{
+              textAlign: "center",
+              marginTop: 10,
+              marginBottom: 20,
+              fontSize: 16,
+              fontWeight: "bold",
+            }}
+          >
+            Make a dream purchase a reality
+          </Text>
+
+          {/* <Image source={itemtwo} style={styles.img}/> */}
+
+          <View
+            style={{
+              flexDirection: "row",
+              justifyContent: "center",
+            }}
+          >
+            <Swiper
+              showsButtons={false}
+              showsPagination={false}
+              style={{ height: 316 }}
+              loop={true}
+              autoplay={true}
+              // slidesPerView={2}
             >
-              <View style={styles.challenges}>
-                <View style={styles.slide1}>
-                  {/* <Image source={fill} style={styles.img} /> */}
-                  <View
-                    style={{ justifyContent: "center", alignItems: "center" }}
-                  >
-                    <Text style={styles.text}>Fill In the blanks</Text>
-                    <Text style={styles.subText}>
-                      Learn by dragging and dropping the correct answers into
-                      the blans.
-                    </Text>
+              <TouchableOpacity
+                style={{ alignItems: "center", overflow: "hidden" }}
+                // onPress={() => {
+                //   navigation.navigate("FillInTheBlanks");
+                // }}
+              >
+                <View style={styles.challenges}>
+                  <Image
+                    source={itemtwo}
+                    style={styles.img}
+                    resizeMode="cover"
+                  />
+                </View>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={{ alignItems: "center", overflow: "hidden" }}
+                // onPress={() => {
+                //   navigation.navigate("FillInTheBlanks");
+                // }}
+              >
+                <View style={styles.challenges}>
+                  <Image
+                    source={itemone}
+                    style={styles.img}
+                    resizeMode="cover"
+                  />
+                </View>
+              </TouchableOpacity>
+              
+            </Swiper>
+          </View>
+          {/* Scrollable Carousel */}
+          <View>
+            <Swiper
+              showsButtons={false}
+              showsPagination={false}
+              style={{ height: 316 }}
+              loop={true}
+              autoplay={true}
+              slidesPerView={2}
+            >
+              <TouchableOpacity
+                style={{ alignItems: "center", overflow: "hidden" }}
+                // onPress={() => {
+                //   navigation.navigate("FillInTheBlanks");
+                // }}
+              >
+                <View style={styles.goal}>
+                  <View style={styles.slide1}>
+                    {/* <Image source={fill} style={styles.img} /> */}
+                    <View
+                      style={{ justifyContent: "center", alignItems: "center" }}
+                    >
+                      <Text style={styles.goaltext}>1</Text>
+                    </View>
                   </View>
                 </View>
-              </View>
-            </TouchableOpacity>
+              </TouchableOpacity>
 
-          </Swiper>
-        </View>
+              <TouchableOpacity
+                style={{ alignItems: "center", overflow: "hidden" }}
+                // onPress={() => {
+                //   navigation.navigate("FillInTheBlanks");
+                // }}
+              >
+                <View style={styles.goal}>
+                  <View style={styles.slide1}>
+                    {/* <Image source={fill} style={styles.img} /> */}
+                    <View
+                      style={{ justifyContent: "center", alignItems: "center" }}
+                    >
+                      <Text style={styles.goaltext}>2</Text>
+                    </View>
+                  </View>
+                </View>
+              </TouchableOpacity>
+            </Swiper>
+          </View>
         </View>
       </View>
     </ScrollView>
@@ -126,7 +190,7 @@ const styles = StyleSheet.create({
     color: "grey",
     fontSize: 16,
   },
-  
+
   amount: {
     fontSize: 24,
     fontWeight: "bold",
@@ -157,7 +221,7 @@ const styles = StyleSheet.create({
     backgroundColor: "transparent",
     paddingVertical: 14,
     paddingHorizontal: 25,
-    justifyContent:'center'
+    justifyContent: "center",
   },
 
   deposit_text: {
@@ -169,7 +233,6 @@ const styles = StyleSheet.create({
     color: "black",
     textAlign: "center", // Center the text within the button
   },
-
 
   wrapper: {
     alignSelf: "center",
@@ -186,18 +249,39 @@ const styles = StyleSheet.create({
     marginTop: 15,
   },
 
-  img: {
-    width: 268,
-    height: 191,
-    borderRadius: 100,
+
+  goaltext: {
+    textAlign: "center",
+    alignSelf: "center",
+    fontSize: 40,
+    fontWeight: "bold",
+    color: "dodgerblue",
+    marginTop: 15,
   },
 
   challenges: {
     width: "100%",
-    backgroundColor: "#000",
+    height: 244,
+    backgroundColor: "lightgray",
+    justifyContent: "center",
+    alignItems: "center",
     borderRadius: 10,
     overflow: "hidden",
+  },
+
+  goal: {
+    width: 500,
     height: 244,
+    backgroundColor: "#fff",
+    justifyContent: "center",
+    alignItems: "center",
+    borderRadius: 10,
+  },
+
+
+  img: {
+    width: "100%",
+    height: "100%",
   },
 
   subText: {
@@ -211,29 +295,3 @@ const styles = StyleSheet.create({
 });
 
 export default MainContentData;
-
-// //import liraries
-// import React, { Component } from 'react';
-// import { View, Text, StyleSheet } from 'react-native';
-
-// // create a component
-// const MainContentData = () => {
-//   return (
-//     <View style={styles.container}>
-//       <Text>MainContentData</Text>
-//     </View>
-//   );
-// };
-
-// // define your styles
-// const styles = StyleSheet.create({
-//   container: {
-//     flex: 1,
-//     justifyContent: 'center',
-//     alignItems: 'center',
-//     backgroundColor: '#2c3e50',
-//   },
-// });
-
-// //make this component available to the app
-// export default MainContentData;
