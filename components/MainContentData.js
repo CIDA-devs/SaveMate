@@ -5,30 +5,39 @@ import {
   Text,
   ScrollView,
   TouchableOpacity,
+  Image
 } from "react-native";
 import { Fontisto } from "@expo/vector-icons";
 import Swiper from "react-native-swiper";
-import { Image } from "react-native";
+// import { Image } from "react-native";
 // import fill from "../assets/images/swiperImage/blank.gif";
 import { useNavigation } from "@react-navigation/native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 // import Options from "./Options";
 
 const MainContentData = () => {
+
+  const amount = 300
   const navigation = useNavigation();
   return (
     <ScrollView>
-      <View style={{ flex: 1 }}>
+      <View style={{ flex: 1,marginHorizontal:20,marginTop:20 }}>
         {/* <Options/> */}
 
         <View style={styles.detailsBox}>
-          <Text style={styles.title}>Challenges</Text>
-          <Text>
-            Scroll to select quizzes to challenge your language learning
-            experience
-          </Text>
+          <Text style={styles.title}>Savings Balance</Text>
+          <Text style={styles.amount}> GH₵ {amount}.00</Text>
+         <View style={styles.btn_div}>
+          <TouchableOpacity style={styles.deposit}>
+            <Text style={styles.deposit_text}>Deposit</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.withdraw}>
+            <Text style={styles.withdraw_text}>Withdraw</Text>
+          </TouchableOpacity>
+         </View>
         </View>
-
+<View>
+        <Text style={{textAlign:"center",marginTop: 10,marginBottom: 20, fontSize:16,fontWeight: "bold"}}>Make a dream purchase a reality</Text>
         <View
           style={{
             flexDirection: "row",
@@ -39,7 +48,20 @@ const MainContentData = () => {
             showsButtons={false}
             showsPagination={false}
             style={{ height: 316 }}
-          >
+            loop={true}
+            autoplay={true}
+            // slidesPerView={2}
+            >
+            <TouchableOpacity
+              style={{ alignItems: "center", overflow: "hidden" }}
+              // onPress={() => {
+              //   navigation.navigate("FillInTheBlanks");
+              // }}
+            >
+              <View style={styles.challenges}>
+               <Image source={itemone}/>
+              </View>
+            </TouchableOpacity>
             <TouchableOpacity
               style={{ alignItems: "center", overflow: "hidden" }}
               // onPress={() => {
@@ -55,7 +77,7 @@ const MainContentData = () => {
                     <Text style={styles.text}>Fill In the blanks</Text>
                     <Text style={styles.subText}>
                       Learn by dragging and dropping the correct answers into
-                      the blanks.
+                      the blans.
                     </Text>
                   </View>
                 </View>
@@ -63,6 +85,7 @@ const MainContentData = () => {
             </TouchableOpacity>
 
           </Swiper>
+        </View>
         </View>
       </View>
     </ScrollView>
@@ -91,7 +114,7 @@ const styles = StyleSheet.create({
   },
 
   detailsBox: {
-    width: 294,
+    width: "100%",
     backgroundColor: "#fff",
     borderRadius: 20,
     alignSelf: "center",
@@ -100,11 +123,53 @@ const styles = StyleSheet.create({
   },
 
   title: {
-    color: "dodgerblue",
-    alignSelf: "center",
+    color: "grey",
+    fontSize: 16,
+  },
+  
+  amount: {
     fontSize: 24,
     fontWeight: "bold",
   },
+  btn_div: {
+    marginTop: 20,
+    flex: 1,
+    flexDirection: "row", // Use flexDirection to horizontally align the buttons
+    justifyContent: "space-evenly",
+    alignItems: "center",
+    height: 50, // Specify a height for the container
+  },
+
+  deposit: {
+    width: "45%", // Adjust the width as needed
+    borderRadius: 16,
+    backgroundColor: "dodgerblue",
+    paddingVertical: 16,
+    paddingHorizontal: 25,
+    color: "white",
+  },
+
+  withdraw: {
+    width: "45%", // Adjust the width as needed
+    borderRadius: 16,
+    borderWidth: 2,
+    borderColor: "dodgerblue",
+    backgroundColor: "transparent",
+    paddingVertical: 14,
+    paddingHorizontal: 25,
+    justifyContent:'center'
+  },
+
+  deposit_text: {
+    color: "white",
+    textAlign: "center", // Center the text within the button
+  },
+
+  withdraw_text: {
+    color: "black",
+    textAlign: "center", // Center the text within the button
+  },
+
 
   wrapper: {
     alignSelf: "center",
@@ -128,11 +193,11 @@ const styles = StyleSheet.create({
   },
 
   challenges: {
-    width: 268,
+    width: "100%",
     backgroundColor: "#000",
     borderRadius: 10,
     overflow: "hidden",
-    height: 294,
+    height: 244,
   },
 
   subText: {

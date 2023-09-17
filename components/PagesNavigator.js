@@ -63,12 +63,14 @@ export function MyBottomTabs() {
           },
           headerRight: () => {
             return (
-              <Ionicons
+              <TouchableOpacity>
+                <Ionicons
                 name="notifications"
                 size={24}
                 color="black"
                 style={styles.righticon}
               />
+              </TouchableOpacity>
             );
           },
           tabBarIcon: () => {
@@ -82,26 +84,30 @@ export function MyBottomTabs() {
         name="Transact"
         component={Transact}
         options={{
-          title: "Discover",
+          title: "",
           headerTitleAlign: "center",
           headerLeft: () => {
             return (
-              <MaterialCommunityIcons
-                name="dots-grid"
+              <TouchableOpacity onPress={toggleDrawer}>
+                <Feather
+                name="menu"
                 size={24}
                 color="black"
                 style={styles.lefticon}
               />
+              </TouchableOpacity>
             );
           },
           headerRight: () => {
             return (
+              <TouchableOpacity>
               <Ionicons
-                name="search-outline"
-                size={24}
-                color="black"
-                style={styles.righticon}
-              />
+              name="notifications"
+              size={24}
+              color="black"
+              style={styles.righticon}
+            />
+            </TouchableOpacity>
             );
           },
           tabBarIcon: () => {
@@ -115,41 +121,35 @@ export function MyBottomTabs() {
         name="AddGoal"
         component={AddGoal}
         options={{
-          title: "Read More",
+          title: "",
           headerTitleAlign: "left",
           headerStyle: {
-            height: 120,
+            height: 80,
           },
           headerLeft: () => {
-            return <View style={styles.headerBefore}></View>;
+            return (
+              <TouchableOpacity onPress={toggleDrawer}>
+              <Feather
+              name="menu"
+              size={24}
+              color="black"
+              style={styles.lefticon}
+            />
+            </TouchableOpacity>
+            );
           },
           headerRight: () => {
             return (
               <View style={styles.iconView}>
-                <TouchableOpacity>
-                  <FontAwesome
-                    name="headphones"
-                    size={24}
-                    color="black"
-                    style={styles.righticon}
-                  />
-                </TouchableOpacity>
-                <TouchableOpacity>
-                  <Entypo
-                    name="heart-outlined"
-                    size={24}
-                    color="black"
-                    style={styles.righticon}
-                  />
-                </TouchableOpacity>
-                <TouchableOpacity>
-                  <SimpleLineIcons
-                    name="share"
-                    size={22}
-                    color="black"
-                    style={styles.righticon}
-                  />
-                </TouchableOpacity>
+               
+               <TouchableOpacity>
+                <Ionicons
+                name="notifications"
+                size={24}
+                color="black"
+                style={styles.righticon}
+              />
+              </TouchableOpacity>
               </View>
             );
           },
