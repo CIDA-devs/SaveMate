@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   StyleSheet,
@@ -6,162 +6,197 @@ import {
   ScrollView,
   TouchableOpacity,
   Image,
+  ActivityIndicator,
+  Dimensions,
 } from "react-native";
-import { useFonts } from 'expo-font';
-import Swiper from "react-native-swiper";
+import { useFonts } from "expo-font";
+
 import { useNavigation } from "@react-navigation/native";
-import itemtwo from "../assets/itemtwo.jpg";
-import itemone from "../assets/wallpaper1.jpg";
+
+import { FlatList } from "react-native-gesture-handler";
+import SavingsComponent from "./SavingsComponent";
 
 const MainContentData = () => {
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const windowWidth = Dimensions.get("window").width;
 
-
+  const [autoScroll, setAutoScroll] = useState(true);
+  const flatListRef = React.createRef();
   const [fontsLoaded] = useFonts({
-    'Poppins': require('../assets/PoppinsFont/Poppins-Medium.ttf'),
+    Poppins: require("../assets/PoppinsFont/Poppins-Medium.ttf"),
   });
 
   if (!fontsLoaded) {
     return null;
   }
 
+  const data = [
+    { imageSource: require("../assets/give.jpg") },
+    { imageSource: require("../assets/games.jpg") },
+    { imageSource: require("../assets/laptop.jpg") },
+    { imageSource: require("../assets/give.jpg") },
+    { imageSource: require("../assets/games.jpg") },
+    { imageSource: require("../assets/laptop.jpg") },
+  ];
+
+  const handleScroll = (event) => {
+    const xOffset = event.nativeEvent.contentOffset.x;
+    const index = Math.round(xOffset / windowWidth);
+
+    setCurrentIndex(index);
+  };
+
   const amount = 300;
   const navigation = useNavigation();
+  const isLoading = false;
+  const error = false;
+
+  const goalsData = [
+    {
+      id: "1",
+      title: "Dream Vacation",
+      description: "A trip to Hawaii",
+      targetAmount: 5000,
+      currentAmount: 2000,
+    },
+    {
+      id: "2",
+      title: "Gaming Console",
+      description: "Latest gaming console",
+      targetAmount: 600,
+      currentAmount: 450,
+    },
+    {
+      id: "3",
+      title: "New Laptop",
+      description: "High-performance laptop",
+      targetAmount: 1500,
+      currentAmount: 850,
+    },
+    {
+      id: "4",
+      title: "Charity Donation",
+      description: "Support a charitable cause",
+      targetAmount: 100,
+      currentAmount: 25,
+    },
+  ];
+
+  // Function to handle card press and navigate to goal details
+  const handleCardPress = (goalId) => {
+    // Navigate to the goal details screen with the selected goal's ID
+    navigation.navigate("GoalDetails", { goalId });
+  };
+
+  // Function to handle "Add Goal" button press and navigate to create goal screen
+  const handleAddGoalPress = () => {
+    // Navigate to the create goal screen
+    navigation.navigate("GoalScreen", { mode: "add" });
+  };
+
   return (
-    <ScrollView>
-      <View style={{ flex: 1, marginHorizontal: 20, marginTop: 20 }}>
-        {/* <Options/> */}
-
-        <View style={styles.detailsBox}>
-          <Text style={styles.title}>Savings Balance</Text>
-          <Text style={styles.amount}> GH₵ {amount}.00</Text>
-          <View style={styles.btn_div}>
-            <TouchableOpacity style={styles.deposit}>
-              <Text style={styles.deposit_text}>Deposit</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.withdraw}>
-              <Text style={styles.withdraw_text}>Withdraw</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-        <View>
-          <Text
-            style={{
-              textAlign: "center",
-              marginTop: 10,
-              marginBottom: 20,
-              fontSize: 16,
-              fontWeight: "bold",
-            }}
-          >
-            Make a dream purchase a reality
-          </Text>
-
-          {/* <Image source={itemtwo} style={styles.img}/> */}
-
-          <View
-            style={{
-              flexDirection: "row",
-              justifyContent: "center",
-            }}
-          >
-            <Swiper
-              showsButtons={false}
-              showsPagination={false}
-              style={{ height: 316 }}
-              loop={true}
-              autoplay={true}
-              // slidesPerView={2}
-            >
-              <TouchableOpacity
-                style={{ alignItems: "center", overflow: "hidden" }}
-                // onPress={() => {
-                //   navigation.navigate("FillInTheBlanks");
-                // }}
-              >
-                <View style={styles.challenges}>
-                  <Image
-                    source={itemtwo}
-                    style={styles.img}
-                    resizeMode="cover"
-                  />
-                </View>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={{ alignItems: "center", overflow: "hidden" }}
-                // onPress={() => {
-                //   navigation.navigate("FillInTheBlanks");
-                // }}
-              >
-                <View style={styles.challenges}>
-                  <Image
-                    source={itemone}
-                    style={styles.img}
-                    resizeMode="cover"
-                  />
-                </View>
-              </TouchableOpacity>
-              
-            </Swiper>
-          </View>
-          {/* Scrollable Carousel */}
+    <View>
+      <ScrollView>
+        <View style={{ flex: 1, marginHorizontal: 20, marginTop: 20 }}>
+          <SavingsComponent />
           <View>
-            <Swiper
-              showsButtons={false}
-              showsPagination={false}
-              style={{ height: 316 }}
-              loop={true}
-              autoplay={true}
-              slidesPerView={2}
+            <Text
+              style={{
+                textAlign: "center",
+                marginTop: 10,
+                marginBottom: 20,
+                fontSize: 16,
+                fontWeight: "bold",
+              }}
             >
-              <TouchableOpacity
-                style={{ alignItems: "center", overflow: "hidden" }}
-                // onPress={() => {
-                //   navigation.navigate("FillInTheBlanks");
-                // }}
-              >
-                <View style={styles.goal}>
-                  <View style={styles.slide1}>
-                    {/* <Image source={fill} style={styles.img} /> */}
-                    <View
-                      style={{ justifyContent: "center", alignItems: "center" }}
-                    >
-                      <Text style={styles.goaltext}>1</Text>
-                    </View>
-                  </View>
-                </View>
-              </TouchableOpacity>
+              Make a dream purchase a reality
+            </Text>
 
-              <TouchableOpacity
-                style={{ alignItems: "center", overflow: "hidden" }}
-                // onPress={() => {
-                //   navigation.navigate("FillInTheBlanks");
-                // }}
-              >
-                <View style={styles.goal}>
-                  <View style={styles.slide1}>
-                    {/* <Image source={fill} style={styles.img} /> */}
-                    <View
-                      style={{ justifyContent: "center", alignItems: "center" }}
+            <View
+              style={{
+                flexDirection: "row",
+                justifyContent: "center",
+              }}
+            ></View>
+
+            <View>
+              {isLoading ? (
+                <ActivityIndicator size="large" />
+              ) : error ? (
+                <Text>Something went wrong</Text>
+              ) : (
+                <FlatList
+                  ref={flatListRef}
+                  data={data}
+                  horizontal
+                  contentContainerStyle={{ columnGap: 8 }}
+                  showsHorizontalScrollIndicator={false}
+                  keyExtractor={(item, index) => index.toString()}
+                  renderItem={({ item }) => (
+                    <TouchableOpacity
+                      onPress={() => setAutoScroll(!autoScroll)}
+                      activeOpacity={1}
+                      style={styles.page}
                     >
-                      <Text style={styles.goaltext}>2</Text>
-                    </View>
-                  </View>
-                </View>
-              </TouchableOpacity>
-            </Swiper>
+                      <Image source={item.imageSource} style={styles.image} />
+                    </TouchableOpacity>
+                  )}
+                  onScroll={handleScroll}
+                  scrollEventThrottle={16}
+                />
+              )}
+            </View>
           </View>
+
+          <View style={styles.headertop}>
+            <Text style={styles.heading}>Goals</Text>
+            <Text style={styles.heading2}>View All</Text>
+          </View>
+          <View style={styles.goalsContainer}>
+            {goalsData.map((goal) => (
+              <TouchableOpacity
+                key={goal.id}
+                style={styles.goalCard}
+                onPress={() => handleCardPress(goal.id)}
+              >
+                <Text style={styles.goalTitle}>{goal.title}</Text>
+                <Text style={styles.goalDescription}>{goal.description}</Text>
+                <Text style={styles.goalAmount}>
+                  ${goal.currentAmount} / ${goal.targetAmount}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+          <View style={styles.marginbottom}></View>
         </View>
-      </View>
-    </ScrollView>
+      </ScrollView>
+      <TouchableOpacity
+        style={styles.addGoalButton}
+        onPress={handleAddGoalPress}
+      >
+        <Text style={styles.addGoalButtonText}>Add Goal</Text>
+      </TouchableOpacity>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
+  page: {
+    justifyContent: "center",
+    alignItems: "center",
+    width: 250,
+    height: 200,
+    padding: 10,
+  },
+  image: {
+    width: "100%",
+    height: "100%",
+    borderRadius: 10,
+  },
   progressBox: {
     width: 185,
     height: 187,
     borderRadius: 30,
-    // backgroundColor: "#000",
     padding: 15,
     alignItems: "center",
     marginHorizontal: 7,
@@ -226,12 +261,12 @@ const styles = StyleSheet.create({
 
   deposit_text: {
     color: "white",
-    textAlign: "center", // Center the text within the button
+    textAlign: "center",
   },
 
   withdraw_text: {
     color: "black",
-    textAlign: "center", // Center the text within the button
+    textAlign: "center",
   },
 
   wrapper: {
@@ -248,7 +283,6 @@ const styles = StyleSheet.create({
     color: "dodgerblue",
     marginTop: 15,
   },
-
 
   goaltext: {
     textAlign: "center",
@@ -278,7 +312,6 @@ const styles = StyleSheet.create({
     borderRadius: 10,
   },
 
-
   img: {
     width: "100%",
     height: "100%",
@@ -291,6 +324,84 @@ const styles = StyleSheet.create({
     marginBottom: 15,
     marginHorizontal: 10,
     textAlign: "center",
+  },
+  headertop: {
+    flex: 1,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 20,
+  },
+  heading: {
+    fontSize: 20,
+    fontWeight: "bold",
+    marginVertical: 20,
+  },
+  heading2: {
+    fontSize: 15,
+    fontWeight: "normal",
+    marginVertical: 20,
+  },
+
+  goalsContainer: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "space-between",
+  },
+
+  goalCard: {
+    width: "48%",
+    backgroundColor: "#fff",
+
+    borderRadius: 10,
+    padding: 10,
+    marginBottom: 20,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
+
+  goalTitle: {
+    fontSize: 16,
+    fontWeight: "bold",
+  },
+
+  goalDescription: {
+    fontSize: 14,
+    color: "gray",
+  },
+
+  goalAmount: {
+    fontSize: 16,
+    fontWeight: "bold",
+    marginTop: 10,
+  },
+
+  addGoalButton: {
+    position: "absolute",
+    bottom: 20,
+    left: "50%", // Center the button horizontally
+    transform: [{ translateX: -50 }], // Center the button horizontally
+    backgroundColor: "black",
+    shadowRadius: 10,
+    shadowColor: "black",
+    borderRadius: 50,
+    paddingVertical: 10,
+    paddingHorizontal: 25,
+    elevation: 3,
+  },
+
+  addGoalButtonText: {
+    color: "white",
+    fontWeight: "bold",
+  },
+  marginbottom: {
+    marginBottom: 100,
   },
 });
 

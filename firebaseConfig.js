@@ -1,11 +1,7 @@
-// firebaseConfig.js
 import { initializeApp } from "firebase/app";
-
-import {
-  getAuth,
-  browserSessionPersistence,
-  setPersistence,
-} from "firebase/auth";
+import { getFirestore } from "firebase/firestore";
+import { initializeAuth, getReactNativePersistence } from "firebase/auth";
+import ReactNativeAsyncStorage from "@react-native-async-storage/async-storage";
 
 const firebaseConfig = {
   apiKey: "AIzaSyC3kxtBNq-3z7dodjJA-nG_KWjava73yqw",
@@ -19,6 +15,16 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 
-const auth = getAuth(app);
+// This check prevents re-initialization if auth is already initialized
+let auth;
+if (!app.auth) {
+  auth = initializeAuth(app, {
+    persistence: getReactNativePersistence(ReactNativeAsyncStorage),
+  });
+} else {
+  auth = getAuth(app);
+}
 
-export { app, auth, browserSessionPersistence };
+const db = getFirestore(app);
+
+export { app, auth, db };
