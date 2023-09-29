@@ -7,6 +7,12 @@ import HomeScreen from "./screens/HomeScreen";
 import CreateAccount from "./screens/CreateAccount";
 import LoginScreen from "./screens/LogInScreen";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
+import { Provider } from "react-redux";
+import store from "./store";
+import AddFunds from "./screens/AddFunds";
+import PaymentScreen from "./screens/PaymentScreen";
+import DepositScreen from "./screens/DepositScreen";
+import GoalDetails from "./screens/GoalDetails";
 
 const Stack = createStackNavigator();
 
@@ -48,41 +54,66 @@ const App = () => {
   }
 
   return (
-    <NavigationContainer>
-      <Stack.Navigator>
-        {!user ? (
-          <>
+    <Provider store={store}>
+      <NavigationContainer>
+        <Stack.Navigator>
+          {!user ? (
+            <>
+              <Stack.Screen
+                name="Create"
+                options={{ headerShown: false }}
+                component={CreateAccount}
+              />
+              <Stack.Screen
+                name="SignUp"
+                options={{ headerShown: false }}
+                component={SignUpScreen}
+              />
+              <Stack.Screen
+                name="Login"
+                options={{ headerShown: false }}
+                component={LoginScreen}
+              />
+            </>
+          ) : user && !user.emailVerified ? (
             <Stack.Screen
-              name="Create"
+              name="Verify"
               options={{ headerShown: false }}
-              component={CreateAccount}
+              component={VerificationScreen}
             />
-            <Stack.Screen
-              name="SignUp"
-              options={{ headerShown: false }}
-              component={SignUpScreen}
-            />
-            <Stack.Screen
-              name="Login"
-              options={{ headerShown: false }}
-              component={LoginScreen}
-            />
-          </>
-        ) : user && !user.emailVerified ? (
-          <Stack.Screen
-            name="Verify"
-            options={{ headerShown: false }}
-            component={VerificationScreen}
-          />
-        ) : (
-          <Stack.Screen
-            name="Home"
-            options={{ headerShown: false }}
-            component={HomeScreen}
-          />
-        )}
-      </Stack.Navigator>
-    </NavigationContainer>
+          ) : (
+            <>
+              <Stack.Screen
+                name="Home"
+                options={{ headerShown: false }}
+                component={HomeScreen}
+              />
+
+              <Stack.Screen
+                name="AddFunds"
+                options={{ headerShown: false }}
+                component={AddFunds}
+              />
+              <Stack.Screen
+                name="PaymentScreen"
+                options={{ headerShown: false }}
+                component={PaymentScreen}
+              />
+              <Stack.Screen
+                name="DepositScreen"
+                options={{ headerShown: false }}
+                component={DepositScreen}
+              />
+              <Stack.Screen
+                name="GoalDetails"
+                options={{ headerShown: false }}
+                component={GoalDetails}
+              />
+            </>
+          )}
+        </Stack.Navigator>
+      </NavigationContainer>
+    </Provider>
   );
 };
 
