@@ -1,4 +1,3 @@
-import React, { useState, useEffect } from "react";
 import {
   View,
   StyleSheet,
@@ -9,130 +8,55 @@ import {
   ActivityIndicator,
   Dimensions,
 } from "react-native";
-import { useFonts } from "expo-font";
-import Frontdata from "./Frontdata";
+import React from "react";
 
-import { useNavigation } from "@react-navigation/native";
+const goalsData = [
+  {
+    id: "1",
+    title: "Dream Vacation",
+    description: "A trip to Hawaii",
+    targetAmount: 5000,
+    currentAmount: 2000,
+  },
+  {
+    id: "2",
+    title: "Gaming Console",
+    description: "Latest gaming console",
+    targetAmount: 600,
+    currentAmount: 450,
+  },
+  {
+    id: "3",
+    title: "New Laptop",
+    description: "High-performance laptop",
+    targetAmount: 1500,
+    currentAmount: 850,
+  },
+  {
+    id: "4",
+    title: "Charity Donation",
+    description: "Support a charitable cause",
+    targetAmount: 100,
+    currentAmount: 25,
+  },
+];
 
-import { FlatList } from "react-native-gesture-handler";
-import SavingsComponent from "./SavingsComponent";
-
-const MainContentData = () => {
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const windowWidth = Dimensions.get("window").width;
-
-  const [autoScroll, setAutoScroll] = useState(true);
-  const flatListRef = React.createRef();
-  const [fontsLoaded] = useFonts({
-    Poppins: require("../assets/PoppinsFont/Poppins-Medium.ttf"),
-  });
-
-  if (!fontsLoaded) {
-    return null;
-  }
-
-  const data = [
-    { imageSource: require("../assets/give.jpg") },
-    { imageSource: require("../assets/games.jpg") },
-    { imageSource: require("../assets/laptop.jpg") },
-    { imageSource: require("../assets/give.jpg") },
-    { imageSource: require("../assets/games.jpg") },
-    { imageSource: require("../assets/laptop.jpg") },
-  ];
-
-  const handleScroll = (event) => {
-    const xOffset = event.nativeEvent.contentOffset.x;
-    const index = Math.round(xOffset / windowWidth);
-
-    setCurrentIndex(index);
-  };
-
-  const amount = 300;
-  const navigation = useNavigation();
-  const isLoading = false;
-  const error = false;
-
-  // Function to handle card press and navigate to goal details
-  const handleCardPress = (goalId) => {
-    // Navigate to the goal details screen with the selected goal's ID
-    navigation.navigate("GoalDetails", { goalId });
-  };
-
-  // Function to handle "Add Goal" button press and navigate to create goal screen
-  const handleAddGoalPress = () => {
-    // Navigate to the create goal screen
-    navigation.navigate("GoalScreen");
-  };
-
+const Frontdata = () => {
   return (
-    <View>
-      <ScrollView>
-        <View style={{ flex: 1, marginHorizontal: 20, marginTop: 20 }}>
-          <SavingsComponent />
-          <View>
-            <Text
-              style={{
-                textAlign: "center",
-                marginTop: 10,
-                marginBottom: 20,
-                fontSize: 16,
-                fontWeight: "bold",
-              }}
-            >
-              Make a dream purchase a reality
-            </Text>
-
-            <View
-              style={{
-                flexDirection: "row",
-                justifyContent: "center",
-              }}
-            ></View>
-
-            <View>
-              {isLoading ? (
-                <ActivityIndicator size="large" />
-              ) : error ? (
-                <Text>Something went wrong</Text>
-              ) : (
-                <FlatList
-                  ref={flatListRef}
-                  data={data}
-                  horizontal
-                  contentContainerStyle={{ columnGap: 8 }}
-                  showsHorizontalScrollIndicator={false}
-                  keyExtractor={(item, index) => index.toString()}
-                  renderItem={({ item }) => (
-                    <TouchableOpacity
-                      onPress={() => setAutoScroll(!autoScroll)}
-                      activeOpacity={1}
-                      style={styles.page}
-                    >
-                      <Image source={item.imageSource} style={styles.image} />
-                    </TouchableOpacity>
-                  )}
-                  onScroll={handleScroll}
-                  scrollEventThrottle={16}
-                />
-              )}
-            </View>
-          </View>
-
-          <View style={styles.headertop}>
-            <Text style={styles.heading}>Goals</Text>
-            <Text style={styles.heading2}>View All</Text>
-          </View>
-          <Frontdata />
-
-          <View style={styles.marginbottom}></View>
-        </View>
-      </ScrollView>
-      <TouchableOpacity
-        style={styles.addGoalButton}
-        onPress={handleAddGoalPress}
-      >
-        <Text style={styles.addGoalButtonText}>Add Goal</Text>
-      </TouchableOpacity>
+    <View style={styles.goalsContainer}>
+      {goalsData.map((goal) => (
+        <TouchableOpacity
+          key={goal.id}
+          style={styles.goalCard}
+          onPress={() => handleCardPress(goal.id)}
+        >
+          <Text style={styles.goalTitle}>{goal.title}</Text>
+          <Text style={styles.goalDescription}>{goal.description}</Text>
+          <Text style={styles.goalAmount}>
+            ${goal.currentAmount} / ${goal.targetAmount}
+          </Text>
+        </TouchableOpacity>
+      ))}
     </View>
   );
 };
@@ -361,5 +285,4 @@ const styles = StyleSheet.create({
     marginBottom: 100,
   },
 });
-
-export default MainContentData;
+export default Frontdata;

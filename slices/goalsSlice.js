@@ -6,7 +6,10 @@ export const fetchGoals = createAsyncThunk("goals/fetchGoals", async () => {
   const db = getFirestore(app);
   const saveMateCollection = collection(db, "SaveMate");
   const goalSnapshot = await getDocs(saveMateCollection);
-  const goalList = goalSnapshot.docs.map((doc) => doc.data());
+  const goalList = goalSnapshot.docs.map((doc) => ({
+    id: doc.id,
+    ...doc.data(),
+  }));
   return goalList;
 });
 
@@ -16,6 +19,16 @@ const goalsSlice = createSlice({
   reducers: {
     addGoal: (state, action) => {
       state.goals.push(action.payload);
+    },
+    updateGoal: (state, action) => {
+      const { id, ...updatedGoalData } = action.payload;
+      const goalIndex = state.goals.findIndex((goal) => goal.id === id);
+      if (goalIndex !== -1) {
+        state.goals[goalIndex] = {
+          ...state.goals[goalIndex],
+          ...updatedGoalData,
+        };
+      }
     },
   },
   extraReducers: (builder) => {
@@ -34,6 +47,6 @@ const goalsSlice = createSlice({
   },
 });
 
-export const { addGoal } = goalsSlice.actions; // Exporting the addGoal action
+export const { addGoal, updateGoal } = goalsSlice.actions;
 
 export default goalsSlice.reducer;

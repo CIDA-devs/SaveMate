@@ -13,10 +13,13 @@ import {
 import DateTimePicker from "@react-native-community/datetimepicker";
 import * as ImagePicker from "expo-image-picker";
 import { FlatList } from "react-native-gesture-handler";
+import { useFocusEffect } from "@react-navigation/native";
 
 import { app } from "../firebaseConfig";
 import { useDispatch } from "react-redux";
-import { addGoal } from "../slices/goalsSlice";
+
+import { useNavigation } from "@react-navigation/native";
+import { addGoal, updateGoal } from "../slices/goalsSlice";
 import {
   getFirestore,
   collection,
@@ -33,17 +36,6 @@ const GoalScreen = ({ route, navigation }) => {
 
   const isEdit = route.params?.mode === "edit";
   const existingGoal = route.params?.goal || {};
-
-  const defaultGoal = {
-    goalName: "",
-    description: "",
-    date: new Date(),
-    dateOfCompletion: "",
-    targetAmount: "",
-    currentAmount: "",
-    selectedImages: [],
-    // any other fields that your goal objects have...
-  };
 
   const [goalName, setGoalName] = useState(isEdit ? existingGoal.goalName : "");
   const [description, setDescription] = useState(
@@ -68,6 +60,54 @@ const GoalScreen = ({ route, navigation }) => {
   const [goalId, setGoalId] = useState(isEdit ? existingGoal.id : "");
   const [firebaseAmount, setFirebaseAmount] = useState(0);
 
+  const resetFields = () => {
+    setGoalName("");
+    setDescription("");
+    setDate(new Date());
+    setDateOfCompletion("");
+    setTargetAmount("");
+    setCurrentAmount("");
+    setSelectedImages([]);
+    setGoalId("");
+  };
+
+  const populateFields = () => {
+    setGoalName(existingGoal.goalName);
+    setDescription(existingGoal.description);
+    setDate(new Date(existingGoal.date));
+    setDateOfCompletion(existingGoal.date);
+    setTargetAmount(existingGoal.targetAmount);
+    setCurrentAmount(existingGoal.currentAmount);
+    setSelectedImages(existingGoal.images);
+    setGoalId(existingGoal.id);
+  };
+
+  useEffect(() => {
+    if (isEdit) {
+      populateFields();
+    }
+
+    const unsubscribeFocus = navigation.addListener("focus", () => {
+      // The screen is focused
+      // Call any action
+      if (isEdit) {
+        populateFields();
+      }
+    });
+
+    const unsubscribeBlur = navigation.addListener("blur", () => {
+      // The screen is unfocused
+      // Call any action
+      resetFields();
+    });
+
+    // Make sure to unsubscribe when you no longer need to listen to the event
+    return () => {
+      unsubscribeFocus();
+      unsubscribeBlur();
+    };
+  }, [navigation, isEdit, existingGoal]);
+
   const toggleDatePicker = () => {
     setShowPicker(!showPicker);
   };
@@ -80,15 +120,6 @@ const GoalScreen = ({ route, navigation }) => {
         allowsMultipleSelection: true,
         base64: true,
       });
-      if (parseFloat(currentAmount) > firebaseAmount) {
-        alert("Insufficient funds");
-        return;
-      }
-
-      if (parseFloat(currentAmount) > parseFloat(targetAmount)) {
-        alert("Current amount cannot be higher than the targeted amount.");
-        return;
-      }
 
       if (!results.canceled) {
         const images = results.assets.map((image) => ({
@@ -138,6 +169,22 @@ const GoalScreen = ({ route, navigation }) => {
   useEffect(() => {
     fetchFirebaseAmount();
   }, []);
+  const updateFirebaseAmount = async () => {
+    const newFirebaseAmount = firebaseAmount - parseFloat(currentAmount);
+
+    // Ensure the new amount is not negative
+    if (newFirebaseAmount >= 0) {
+      try {
+        const docRef = doc(db, "transactions", "transaction");
+        await updateDoc(docRef, { amount: newFirebaseAmount });
+        setFirebaseAmount(newFirebaseAmount); // Update local state
+      } catch (error) {
+        console.error("Error updating amount: ", error);
+      }
+    } else {
+      alert("The amount entered exceeds the available funds.");
+    }
+  };
 
   const saveGoalToFirestore = async () => {
     try {
@@ -146,9 +193,15 @@ const GoalScreen = ({ route, navigation }) => {
         alert("Current amount cannot be higher than the targeted amount.");
         return;
       }
+      if (!isEdit && parseFloat(currentAmount) > firebaseAmount) {
+        alert("Insufficient funds");
+        return;
+      }
 
-      const saveMateCollection = collection(db, "SaveMate");
-
+      if (parseFloat(currentAmount) > parseFloat(targetAmount)) {
+        alert("Current amount cannot be higher than the targeted amount.");
+        return;
+      }
       const goalData = {
         goalName,
         description,
@@ -160,21 +213,22 @@ const GoalScreen = ({ route, navigation }) => {
         images: selectedImages,
       };
 
+      const saveMateCollection = collection(db, "SaveMate");
       let docRef;
+
       if (isEdit) {
         // Update the existing document if in edit mode
         docRef = doc(db, "SaveMate", goalId);
         await updateDoc(docRef, goalData);
         console.log("Goal updated with ID: ", goalId);
+        dispatch(updateGoal({ id: goalId, ...goalData }));
       } else {
         // Create a new document if not in edit mode
         docRef = await addDoc(saveMateCollection, goalData);
         setGoalId(docRef.id);
         console.log("Goal saved with ID: ", docRef.id);
+        dispatch(addGoal({ id: docRef.id, ...goalData }));
       }
-
-      // Update the redux store
-      dispatch(addGoal({ id: isEdit ? goalId : docRef.id, ...goalData }));
 
       // Reset the form fields
       setGoalName("");
@@ -192,8 +246,11 @@ const GoalScreen = ({ route, navigation }) => {
     } catch (error) {
       console.error("Error saving goal: ", error);
     }
+    if (!isEdit) {
+      // Only update the Firebase amount if in "Add Goal" mode
+      await updateFirebaseAmount();
+    }
   };
-
   return (
     <View>
       <ScrollView>
@@ -289,6 +346,7 @@ const GoalScreen = ({ route, navigation }) => {
             value={currentAmount}
             onChangeText={(text) => setCurrentAmount(text)}
             keyboardType="numeric"
+            editable={!isEdit}
           />
           {parseFloat(currentAmount) > firebaseAmount && ( // Compare currentAmount with firebaseAmount
             <TouchableOpacity>

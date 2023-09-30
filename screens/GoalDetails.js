@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -10,6 +10,16 @@ import {
 } from "react-native";
 import Icon from "react-native-vector-icons/FontAwesome"; // Import FontAwesome icons
 import { useNavigation } from "@react-navigation/native";
+import { app } from "../firebaseConfig";
+import {
+  getFirestore,
+  collection,
+  addDoc,
+  doc,
+  updateDoc,
+  getDoc,
+} from "firebase/firestore";
+const db = getFirestore(app);
 
 const GoalDetailScreen = ({ route }) => {
   console.log("Received Params:", route.params);
@@ -38,6 +48,46 @@ const GoalDetailScreen = ({ route }) => {
   }
 
   const { goal } = route.params;
+  const [currentAmount, setCurrentAmount] = useState(goal.currentAmount);
+  const [targetAmount, setTargetAmount] = useState(goal.targetAmount);
+  const [firebaseAmount, setFirebaseAmount] = useState(0);
+  const [showInsufficientFunds, setShowInsufficientFunds] = useState(false);
+
+  const fetchFirebaseAmount = async () => {
+    try {
+      const docRef = doc(db, "transactions", "transaction");
+      const docSnap = await getDoc(docRef);
+
+      if (docSnap.exists()) {
+        setFirebaseAmount(parseFloat(docSnap.data().amount));
+      } else {
+        console.log("No such document!");
+      }
+    } catch (error) {
+      console.error("Error fetching amount: ", error);
+    }
+  };
+  useEffect(() => {
+    fetchFirebaseAmount();
+  }, []);
+
+  const handleDeposit = () => {
+    if (parseFloat(targetAmount) > parseFloat(firebaseAmount)) {
+      setShowInsufficientFunds(true);
+      return;
+    }
+    navigation.navigate("AddFunds", { goal });
+    // Logic for depositing money
+    setShowInsufficientFunds(false);
+  };
+
+  const handleWithdraw = () => {
+    // Logic for withdrawing money
+    if (parseFloat(currentAmount) < parseFloat(targetAmount)) {
+      alert("Savings goal not met");
+      return;
+    }
+  };
 
   return (
     <ScrollView style={styles.container}>
@@ -62,9 +112,35 @@ const GoalDetailScreen = ({ route }) => {
       </View>
       <View style={styles.section}>
         <Icon name="money" size={20} color="#075985" style={styles.icon} />
-        <Text style={styles.label}>Current Amount:</Text>
+        <Text style={styles.label}>Amount Saved:</Text>
         <Text style={styles.text}>${goal.currentAmount}</Text>
       </View>
+
+      <View style={styles.buttonContainer}>
+        <TouchableOpacity style={styles.depositButton} onPress={handleDeposit}>
+          <Text style={styles.buttonText}>Deposit</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[
+            styles.withdrawButton,
+            parseFloat(currentAmount) === parseFloat(targetAmount)
+              ? {}
+              : styles.disabledButton,
+          ]}
+          onPress={handleWithdraw}
+          disabled={parseFloat(currentAmount) !== parseFloat(targetAmount)}
+        >
+          <Text style={styles.buttonText}>Withdraw</Text>
+        </TouchableOpacity>
+      </View>
+      {showInsufficientFunds && (
+        <View style={styles.insufficientFundsContainer}>
+          <Text style={styles.insufficientFundsText}>Insufficient funds.</Text>
+          <TouchableOpacity>
+            <Text style={styles.addFundsText}>Add Funds</Text>
+          </TouchableOpacity>
+        </View>
+      )}
       <Text style={styles.label}>Images:</Text>
       <View style={styles.imagesContainer}>
         {goal.images.map((image, index) => (
@@ -99,7 +175,7 @@ const GoalDetailScreen = ({ route }) => {
           onPress={() =>
             navigation.navigate("GoalScreen", {
               mode: "edit",
-              goal: existingGoal,
+              goal: goal,
             })
           }
         >
@@ -114,7 +190,31 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
+    marginTop: 70,
+    marginBottom: 50,
     backgroundColor: "#f9f9f9", // Light background color
+  },
+  buttonContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginVertical: 10,
+  },
+  depositButton: {
+    backgroundColor: "blue",
+    padding: 10,
+    borderRadius: 5,
+  },
+  withdrawButton: {
+    backgroundColor: "green",
+    padding: 10,
+    borderRadius: 5,
+  },
+  disabledButton: {
+    backgroundColor: "gray",
+  },
+  buttonText: {
+    color: "white",
+    fontSize: 16,
   },
   header: {
     flexDirection: "row",
