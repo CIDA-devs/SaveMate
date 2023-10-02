@@ -5,10 +5,7 @@ const CreateAccount = ({ navigation }) => {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>SaveMate</Text>
-      <Image
-        source={require("../assets/create.png")} // Replace with your image path
-        style={styles.image}
-      />
+      <Image source={require("../assets/create.png")} style={styles.image} />
       <Text style={styles.subtitle}>Save today, Save your future</Text>
       <Text style={styles.description}>
         Save money with us and purchase that dream item.{"\n"}
@@ -26,7 +23,7 @@ const CreateAccount = ({ navigation }) => {
       >
         <Text>
           {" "}
-          <Text style={styles.logintext}>Already have an account? </Text>{" "}
+          <Text style={styles.logintext}>Already have an account? </Text>
           <Text style={styles.linkButtonText}>Log In</Text>
         </Text>
       </TouchableOpacity>
@@ -66,7 +63,7 @@ const styles = StyleSheet.create({
     fontWeight: "300",
   },
   customButton: {
-    backgroundColor: "#0173FA", // You can change this color
+    backgroundColor: "#0173FA",
     paddingVertical: 10,
     paddingHorizontal: 20,
     width: "100%",
@@ -74,7 +71,7 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   buttonText: {
-    color: "#fff", // Text color for the button
+    color: "#fff",
     fontSize: 15,
     textAlign: "center",
   },

@@ -8,7 +8,9 @@ import {
   ScrollView,
   TouchableOpacity,
 } from "react-native";
-import Icon from "react-native-vector-icons/FontAwesome"; // Import FontAwesome icons
+import Icon from "react-native-vector-icons/FontAwesome";
+import ConfettiCannon from "react-native-confetti-cannon";
+
 import { useNavigation } from "@react-navigation/native";
 import { app } from "../firebaseConfig";
 import {
@@ -52,7 +54,85 @@ const GoalDetailScreen = ({ route }) => {
   const [targetAmount, setTargetAmount] = useState(goal.targetAmount);
   const [firebaseAmount, setFirebaseAmount] = useState(0);
   const [showInsufficientFunds, setShowInsufficientFunds] = useState(false);
+  const [isCelebrating, setIsCelebrating] = useState(false);
+  const [celebrationTriggered, setCelebrationTriggered] = useState(false);
+  const [isGoalAchieved, setIsGoalAchieved] = useState(false);
 
+  useEffect(() => {
+    setIsGoalAchieved(parseFloat(currentAmount) === parseFloat(targetAmount));
+  }, [currentAmount, targetAmount]);
+  const getContainerStyle = () => ({
+    flex: 1,
+    padding: 20,
+    marginTop: 70,
+    marginBottom: 50,
+    backgroundColor:
+      isGoalAchieved || targetAmount === 0 ? "#FFF2D8" : "#f9f9f9",
+  });
+  const getContainerStyle2 = () => ({
+    flex: 1,
+    marginTop: isGoalAchieved || targetAmount === 0 ? 0 : -70,
+
+    backgroundColor:
+      isGoalAchieved || targetAmount === 0 ? "#FFF2D8" : "#f9f9f9",
+  });
+
+  const getHeaderStyle = () => ({
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 20,
+    backgroundColor: isGoalAchieved || targetAmount === 0 ? "#113946" : "#fff",
+    padding: 15,
+    borderRadius: 10,
+  });
+
+  const getHeadingStyle = () => ({
+    fontSize: 24,
+    fontWeight: "bold",
+    color: isGoalAchieved || targetAmount === 0 ? "#fff" : "#075985",
+  });
+
+  const getSectionStyle = () => ({
+    backgroundColor: isGoalAchieved || targetAmount === 0 ? "#113946" : "#fff",
+    padding: 15,
+    borderRadius: 10,
+    marginBottom: 20,
+  });
+
+  const getIconColor = () =>
+    isGoalAchieved || targetAmount === 0 ? "#fff" : "#075985";
+
+  const getLabelStyle = () => ({
+    fontSize: 16,
+    marginTop: 10,
+    fontWeight: "bold",
+    color: isGoalAchieved || targetAmount === 0 ? "#fff" : "#075985",
+    marginBottom: 5,
+  });
+
+  const getTextStyle = () => ({
+    fontSize: 16,
+    color: isGoalAchieved || targetAmount === 0 ? "#fff" : "#333",
+  });
+  const getDepositButtonStyle = () => ({
+    backgroundColor:
+      isGoalAchieved || targetAmount === 0 ? "gray" : "dodgerblue",
+    padding: 10,
+    borderRadius: 5,
+  });
+
+  const getEditGoalTextStyle = () => ({
+    fontSize: 16,
+    fontWeight: "bold",
+    color: isGoalAchieved || targetAmount === 0 ? "gray" : "#075985",
+    marginBottom: 5,
+  });
+  const getEditGoalTextStyle2 = () => ({
+    fontSize: 26,
+    fontWeight: "bold",
+    color: "#113946",
+  });
   const fetchFirebaseAmount = async () => {
     try {
       const docRef = doc(db, "transactions", "transaction");
@@ -72,10 +152,6 @@ const GoalDetailScreen = ({ route }) => {
   }, []);
 
   const handleDeposit = () => {
-    if (parseFloat(targetAmount) > parseFloat(firebaseAmount)) {
-      setShowInsufficientFunds(true);
-      return;
-    }
     navigation.navigate("AddFunds", { goal });
     // Logic for depositing money
     setShowInsufficientFunds(false);
@@ -87,102 +163,152 @@ const GoalDetailScreen = ({ route }) => {
       alert("Savings goal not met");
       return;
     }
+    navigation.navigate("Withdraw", {
+      targetAmount: targetAmount,
+      goalId: goal.id,
+    });
   };
+  useEffect(() => {
+    if (
+      parseFloat(currentAmount) === parseFloat(targetAmount) &&
+      !celebrationTriggered
+    ) {
+      setIsCelebrating(true);
+      setCelebrationTriggered(true);
+      setTimeout(() => setIsCelebrating(false), 5000);
+    }
+  }, [currentAmount, targetAmount, celebrationTriggered]);
 
   return (
-    <ScrollView style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.heading}>{goal.goalName}</Text>
-        <Icon name="bullseye" size={24} color="#075985" />
-      </View>
-      <View style={styles.section}>
-        <Icon name="align-left" size={20} color="#075985" style={styles.icon} />
-        <Text style={styles.label}>Description:</Text>
-        <Text style={styles.text}>{goal.description}</Text>
-      </View>
-      <View style={styles.section}>
-        <Icon name="calendar" size={20} color="#075985" style={styles.icon} />
-        <Text style={styles.label}>Date:</Text>
-        <Text style={styles.text}>{goal.date}</Text>
-      </View>
-      <View style={styles.section}>
-        <Icon name="dollar" size={20} color="#075985" style={styles.icon} />
-        <Text style={styles.label}>Target Amount:</Text>
-        <Text style={styles.text}>${goal.targetAmount}</Text>
-      </View>
-      <View style={styles.section}>
-        <Icon name="money" size={20} color="#075985" style={styles.icon} />
-        <Text style={styles.label}>Amount Saved:</Text>
-        <Text style={styles.text}>${goal.currentAmount}</Text>
-      </View>
-
-      <View style={styles.buttonContainer}>
-        <TouchableOpacity style={styles.depositButton} onPress={handleDeposit}>
-          <Text style={styles.buttonText}>Deposit</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[
-            styles.withdrawButton,
-            parseFloat(currentAmount) === parseFloat(targetAmount)
-              ? {}
-              : styles.disabledButton,
-          ]}
-          onPress={handleWithdraw}
-          disabled={parseFloat(currentAmount) !== parseFloat(targetAmount)}
+    <View style={getContainerStyle2()}>
+      {isCelebrating && (
+        <View
+          style={{
+            position: "absolute",
+            zIndex: 1000,
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+          }}
         >
-          <Text style={styles.buttonText}>Withdraw</Text>
-        </TouchableOpacity>
-      </View>
-      {showInsufficientFunds && (
-        <View style={styles.insufficientFundsContainer}>
-          <Text style={styles.insufficientFundsText}>Insufficient funds.</Text>
-          <TouchableOpacity>
-            <Text style={styles.addFundsText}>Add Funds</Text>
-          </TouchableOpacity>
+          <ConfettiCannon count={50} origin={{ x: 0, y: 0 }} />
         </View>
       )}
-      <Text style={styles.label}>Images:</Text>
-      <View style={styles.imagesContainer}>
-        {goal.images.map((image, index) => (
-          <TouchableOpacity key={index} onPress={() => openImageModal(image)}>
-            <Image source={{ uri: image.uri }} style={styles.image} />
-          </TouchableOpacity>
-        ))}
-      </View>
-      <Modal
-        visible={isModalVisible}
-        transparent={true}
-        onRequestClose={closeImageModal}
-      >
-        <View style={styles.modalContainer}>
-          {activeImage && (
-            <Image
-              source={{ uri: activeImage.uri }}
-              style={styles.modalImage}
-              resizeMode="contain" // This ensures the image fits within the modal
-            />
-          )}
+      <ScrollView style={getContainerStyle()}>
+        <View style={styles.section}>
+          <Text style={getEditGoalTextStyle2()}>
+            {isGoalAchieved || targetAmount === 0 ? "GOAL ACHIEVED 🎉🎉" : ""}
+          </Text>
+        </View>
+        <View style={getHeaderStyle()}>
+          <Text style={getHeadingStyle()}>{goal.goalName}</Text>
+          <Icon name="bullseye" size={24} color={getIconColor()} />
+        </View>
+        <View style={getSectionStyle()}>
+          <Icon name="align-left" size={20} color={getIconColor()} />
+          <Text style={getLabelStyle()}>Description:</Text>
+          <Text style={getTextStyle()}>{goal.description}</Text>
+        </View>
+        <Text style={styles.label}>My Goal Images:</Text>
+        <View style={styles.imagesContainer}>
+          {goal.images.map((image, index) => (
+            <TouchableOpacity key={index} onPress={() => openImageModal(image)}>
+              <Image source={{ uri: image.uri }} style={styles.image} />
+            </TouchableOpacity>
+          ))}
+        </View>
+        <Modal
+          visible={isModalVisible}
+          transparent={true}
+          onRequestClose={closeImageModal}
+        >
+          <View style={styles.modalContainer}>
+            {activeImage && (
+              <Image
+                source={{ uri: activeImage.uri }}
+                style={styles.modalImage}
+                resizeMode="contain"
+              />
+            )}
+            <TouchableOpacity
+              style={styles.modalBackButton}
+              onPress={closeImageModal}
+            >
+              <Text style={styles.modalBackButtonText}>Close</Text>
+            </TouchableOpacity>
+          </View>
+        </Modal>
+        <View style={styles.section}>
+          <Icon name="calendar" size={20} color="#075985" style={styles.icon} />
+          <Text style={styles.label}>Date:</Text>
+          <Text style={styles.text}>{goal.date}</Text>
+        </View>
+        <View style={styles.section}>
+          <Icon name="dollar" size={20} color="#075985" style={styles.icon} />
+          <Text style={styles.label}>Target Amount:</Text>
+          <Text style={styles.text}>${goal.targetAmount}</Text>
+        </View>
+        <View style={styles.section}>
+          <Icon name="money" size={20} color="#075985" style={styles.icon} />
+          <Text style={styles.label}>Amount Saved:</Text>
+          <Text style={styles.text}>${goal.currentAmount}</Text>
+        </View>
+
+        <View style={styles.buttonContainer}>
           <TouchableOpacity
-            style={styles.modalBackButton}
-            onPress={closeImageModal}
+            style={getDepositButtonStyle()}
+            onPress={handleDeposit}
+            disabled={isGoalAchieved || targetAmount === 0}
           >
-            <Text style={styles.modalBackButtonText}>Close</Text>
+            <Text style={styles.buttonText}>Add Funds</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[
+              styles.withdrawButton,
+              parseFloat(targetAmount) === 0 ? styles.disabledButton : {},
+            ]}
+            onPress={handleWithdraw}
+            disabled={parseFloat(targetAmount) === 0}
+          >
+            <Text style={styles.buttonText}>Withdraw</Text>
           </TouchableOpacity>
         </View>
-      </Modal>
-      <View style={styles.section}>
-        <TouchableOpacity
-          onPress={() =>
-            navigation.navigate("GoalScreen", {
-              mode: "edit",
-              goal: goal,
-            })
-          }
-        >
-          <Text style={styles.label}>EDIT THIS GOAL</Text>
-        </TouchableOpacity>
-      </View>
-    </ScrollView>
+        {parseFloat(targetAmount) === 0 && (
+          <View style={styles.messageContainer}>
+            <Text style={styles.messageText}>Funds removed</Text>
+          </View>
+        )}
+        {showInsufficientFunds && (
+          <View style={styles.insufficientFundsContainer}>
+            <Text style={styles.insufficientFundsText}>
+              Insufficient funds.
+            </Text>
+            <TouchableOpacity>
+              <Text style={styles.addFundsText}>Add Funds</Text>
+            </TouchableOpacity>
+          </View>
+        )}
+
+        <View style={styles.section}>
+          <TouchableOpacity
+            onPress={() =>
+              navigation.navigate("GoalScreen", {
+                mode: "edit",
+                goal: goal,
+              })
+            }
+            disabled={isGoalAchieved || targetAmount === 0}
+          >
+            <Text style={getEditGoalTextStyle()}>
+              {isGoalAchieved || targetAmount === 0
+                ? "GOAL ACHIEVED 🎉🎉"
+                : "EDIT THIS GOAL"}
+            </Text>
+          </TouchableOpacity>
+        </View>
+      </ScrollView>
+    </View>
   );
 };
 
@@ -192,7 +318,6 @@ const styles = StyleSheet.create({
     padding: 20,
     marginTop: 70,
     marginBottom: 50,
-    backgroundColor: "#f9f9f9", // Light background color
   },
   buttonContainer: {
     flexDirection: "row",
@@ -200,7 +325,7 @@ const styles = StyleSheet.create({
     marginVertical: 10,
   },
   depositButton: {
-    backgroundColor: "blue",
+    backgroundColor: "dodgerblue",
     padding: 10,
     borderRadius: 5,
   },
@@ -225,10 +350,8 @@ const styles = StyleSheet.create({
   heading: {
     fontSize: 24,
     fontWeight: "bold",
-    color: "#075985", // Dark blue color
   },
   section: {
-    backgroundColor: "#fff", // White background color for each section
     padding: 15,
     borderRadius: 10,
     marginBottom: 20,
@@ -239,24 +362,23 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 16,
     fontWeight: "bold",
-    color: "#075985",
+
     marginBottom: 5,
   },
   text: {
     fontSize: 16,
-    color: "#333", // Dark gray color
   },
   imagesContainer: {
     flexDirection: "row",
     flexWrap: "wrap",
-    backgroundColor: "#fff",
+    backgroundColor: "#FFF2D8",
     padding: 15,
     borderRadius: 10,
     marginBottom: 20,
   },
   image: {
-    width: 100,
-    height: 100,
+    width: 150,
+    height: 150,
     margin: 5,
   },
   errorText: {
@@ -265,9 +387,9 @@ const styles = StyleSheet.create({
   },
   modalContainer: {
     flex: 1,
-    backgroundColor: "rgba(0, 0, 0, 0.5)", // Semi-transparent background
-    justifyContent: "center", // Center the contents vertically
-    alignItems: "center", // Center the contents horizontally
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    justifyContent: "center",
+    alignItems: "center",
   },
   modalBackButton: {
     position: "absolute",
@@ -282,9 +404,9 @@ const styles = StyleSheet.create({
     color: "black",
   },
   modalImage: {
-    width: "90%", // Set width to a percentage of the screen width
-    height: "80%", // Set height to a percentage of the screen height
-    borderRadius: 10, // Optional: for rounded corners
+    width: "90%",
+    height: "80%",
+    borderRadius: 10,
   },
 });
 

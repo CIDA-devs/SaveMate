@@ -1,34 +1,53 @@
-// src/SavedGoalsScreen.js
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
   FlatList,
   TouchableOpacity,
   StyleSheet,
+  ActivityIndicator,
 } from "react-native";
 import Icon from "react-native-vector-icons/FontAwesome";
 import { useNavigation } from "@react-navigation/native";
 import { useSelector, useDispatch } from "react-redux";
-import { fetchGoals } from "../slices/goalsSlice"; // Update this path if your file structure is different
+import { updateGoals } from "../slices/goalsSlice";
 import ProgressBar from "./ProgressBar";
+import firebase from "../firebaseConfig";
+import { getFirestore, collection, onSnapshot } from "firebase/firestore";
+
+const db = getFirestore(firebase);
 
 const SavedGoalsScreen = () => {
   const dispatch = useDispatch();
   const navigation = useNavigation();
   const goals = useSelector((state) => state.goals.goals);
-  const goalsStatus = useSelector((state) => state.goals.status);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (goalsStatus === "idle") {
-      dispatch(fetchGoals());
-    }
-  }, [goalsStatus, dispatch]);
+    const goalsCollection = collection(db, "SaveMate");
+    const unsubscribe = onSnapshot(goalsCollection, (snapshot) => {
+      const newGoals = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+      dispatch(updateGoals(newGoals));
+      setLoading(false);
+    });
+
+    return unsubscribe;
+  }, [dispatch]);
 
   const navigateToDetail = (goal) => {
     navigation.navigate("GoalDetails", { goal });
   };
 
+  if (loading) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#0000ff" />
+      </View>
+    );
+  }
   return (
     <View style={styles.container}>
       <FlatList
@@ -54,7 +73,7 @@ const SavedGoalsScreen = () => {
                   color="#fff"
                   style={styles.icon}
                 />
-                {/* Update the following line */}
+
                 <ProgressBar
                   progress={item.currentAmount / item.targetAmount}
                   width={300}
@@ -73,8 +92,14 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     paddingHorizontal: 20,
-    paddingVertical: 15,
-    backgroundColor: "#fff",
+    paddingTop: 10,
+    backgroundColor: "#FFF2D8",
+  },
+  loadingContainer: {
+    flex: 1,
+    backgroundColor: "#FFF2D8",
+    justifyContent: "center",
+    alignItems: "center",
   },
   card: {
     backgroundColor: "#2E4374",

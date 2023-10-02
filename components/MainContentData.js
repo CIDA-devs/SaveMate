@@ -18,6 +18,7 @@ import { FlatList } from "react-native-gesture-handler";
 import SavingsComponent from "./SavingsComponent";
 
 const MainContentData = () => {
+  const navigation = useNavigation();
   const [currentIndex, setCurrentIndex] = useState(0);
   const windowWidth = Dimensions.get("window").width;
 
@@ -47,25 +48,19 @@ const MainContentData = () => {
     setCurrentIndex(index);
   };
 
-  const amount = 300;
-  const navigation = useNavigation();
   const isLoading = false;
   const error = false;
 
-  // Function to handle card press and navigate to goal details
-  const handleCardPress = (goalId) => {
-    // Navigate to the goal details screen with the selected goal's ID
-    navigation.navigate("GoalDetails", { goalId });
-  };
-
-  // Function to handle "Add Goal" button press and navigate to create goal screen
   const handleAddGoalPress = () => {
-    // Navigate to the create goal screen
     navigation.navigate("GoalScreen");
   };
 
   return (
-    <View>
+    <View
+      style={{
+        backgroundColor: "#FFF2D8",
+      }}
+    >
       <ScrollView>
         <View style={{ flex: 1, marginHorizontal: 20, marginTop: 20 }}>
           <SavingsComponent />
@@ -119,8 +114,9 @@ const MainContentData = () => {
           </View>
 
           <View style={styles.headertop}>
-            <Text style={styles.heading}>Goals</Text>
-            <Text style={styles.heading2}>View All</Text>
+            <Text style={styles.heading}>
+              Get solid financial assistance with SaveMate
+            </Text>
           </View>
           <Frontdata />
 
@@ -190,14 +186,14 @@ const styles = StyleSheet.create({
   btn_div: {
     marginTop: 20,
     flex: 1,
-    flexDirection: "row", // Use flexDirection to horizontally align the buttons
+    flexDirection: "row",
     justifyContent: "space-evenly",
     alignItems: "center",
-    height: 50, // Specify a height for the container
+    height: 50,
   },
 
   deposit: {
-    width: "45%", // Adjust the width as needed
+    width: "45%",
     borderRadius: 16,
     backgroundColor: "dodgerblue",
     paddingVertical: 16,
@@ -206,7 +202,7 @@ const styles = StyleSheet.create({
   },
 
   withdraw: {
-    width: "45%", // Adjust the width as needed
+    width: "45%",
     borderRadius: 16,
     borderWidth: 2,
     borderColor: "dodgerblue",
@@ -290,9 +286,9 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   heading: {
-    fontSize: 20,
-    fontWeight: "bold",
-    marginVertical: 20,
+    fontSize: 15,
+    fontWeight: "500",
+    marginTop: 30,
   },
   heading2: {
     fontSize: 15,
@@ -358,7 +354,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   marginbottom: {
-    marginBottom: 100,
+    paddingBottom: 100,
   },
 });
 

@@ -1,43 +1,43 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import {
   View,
   TextInput,
   TouchableOpacity,
   Text,
   StyleSheet,
+  ActivityIndicator,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { Paystack } from "react-native-paystack-webview";
 import firebase from "../firebaseConfig";
-import { getFirestore, doc, updateDoc, setDoc } from "firebase/firestore";
-import { increment } from "firebase/firestore";
+import { getFirestore, doc, updateDoc } from "firebase/firestore";
 
 const db = getFirestore(firebase);
 
-const DepositScreen = () => {
-  const [amount, setAmount] = useState("");
+const WithdrawScreen = ({ route }) => {
+  const { targetAmount, goalId } = route.params;
   const [email, setEmail] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
+  const [isUpdating, setIsUpdating] = useState(false);
   const navigation = useNavigation();
-
   const paystackWebViewRef = useRef();
 
   const handleSuccess = async (res) => {
+    setIsUpdating(true);
     try {
-      const docRef = doc(db, "transactions", "transaction");
-      await setDoc(
-        docRef,
-        {
-          amount: increment(parseFloat(amount)),
-        },
-        { merge: true }
-      );
-      navigation.navigate("Home");
+      const docRef = doc(db, "SaveMate", goalId);
+      await updateDoc(docRef, {
+        targetAmount: parseFloat(0),
+      });
+      setIsUpdating(false);
+      navigation.navigate("All Goals");
     } catch (error) {
       console.error("Error updating Firestore: ", error);
+      setIsUpdating(false);
     }
   };
 
-  const handleDeposit = () => {
+  const handleWithdraw = () => {
     paystackWebViewRef.current.startTransaction();
   };
 
@@ -53,23 +53,31 @@ const DepositScreen = () => {
       />
       <TextInput
         style={styles.input}
-        placeholder="Amount to deposit"
-        value={amount}
-        onChangeText={setAmount}
-        keyboardType="numeric"
+        placeholder="Phone Number"
+        value={phoneNumber}
+        onChangeText={setPhoneNumber}
+        keyboardType="phone-pad"
         placeholderTextColor="#fff"
       />
       <Paystack
         paystackKey="pk_test_0edda270529c6a7b50ef15242ef7c4d46bb17909"
         billingEmail={email}
-        amount={amount}
+        amount={targetAmount}
         currency="GHS"
         channels={["card", "bank", "ussd", "qr", "mobile_money"]}
         onSuccess={handleSuccess}
         ref={paystackWebViewRef}
       />
-      <TouchableOpacity style={styles.fundButton} onPress={handleDeposit}>
-        <Text style={styles.buttonText}>Add Funds</Text>
+      <TouchableOpacity
+        style={styles.fundButton}
+        onPress={handleWithdraw}
+        disabled={isUpdating}
+      >
+        {isUpdating ? (
+          <ActivityIndicator color="#fff" />
+        ) : (
+          <Text style={styles.buttonText}>Withdraw</Text>
+        )}
       </TouchableOpacity>
     </View>
   );
@@ -106,4 +114,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default DepositScreen;
+export default WithdrawScreen;

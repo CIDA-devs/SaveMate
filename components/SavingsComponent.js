@@ -1,36 +1,50 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  ActivityIndicator,
+} from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { getFirestore, doc, onSnapshot } from "firebase/firestore";
-import firebase from "../firebaseConfig"; // Adjust the import to your Firebase config file
+import firebase from "../firebaseConfig";
+import { FontAwesome5 } from "@expo/vector-icons";
 
 const db = getFirestore(firebase);
 
 const SavingsComponent = () => {
   const [amount, setAmount] = useState(0);
-  const navigation = useNavigation(); // This is used to navigate to the DepositScreen
+  const navigation = useNavigation();
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Get a reference to the document
     const docRef = doc(db, "transactions", "transaction");
 
-    // Set up a listener to the document with onSnapshot
     const unsubscribe = onSnapshot(docRef, (doc) => {
       if (doc.exists()) {
         setAmount(doc.data().amount);
+        setIsLoading(false);
       } else {
         console.log("No such document!");
+        setIsLoading(false);
       }
     });
 
-    // Clean up the listener when the component is unmounted
     return () => unsubscribe();
-  }, []); // Empty dependency array means this useEffect runs once, similar to componentDidMount
+  }, []);
 
+  if (isLoading) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#0000ff" />
+      </View>
+    );
+  }
   return (
     <View style={styles.detailsBox}>
       <Text style={styles.title}>Savings Balance</Text>
-      <Text style={styles.amount}>GH₵ {amount}.00</Text>
+      <Text style={styles.amount}>GH₵{amount}</Text>
       <View style={styles.btn_div}>
         <TouchableOpacity
           style={styles.deposit}
@@ -38,20 +52,19 @@ const SavingsComponent = () => {
             navigation.navigate("DepositScreen", { goalId: "transactions" })
           }
         >
+          <FontAwesome5
+            name="arrow-down"
+            size={24}
+            color="white"
+            style={styles.icon}
+          />
+
           <Text style={styles.deposit_text}>Deposit</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.withdraw}
-          // onPress for withdrawal can be updated once you have a screen or logic for it
-        >
-          <Text style={styles.withdraw_text}>Withdraw</Text>
         </TouchableOpacity>
       </View>
     </View>
   );
 };
-
-// ... rest of your code including styles and export statement
 
 const styles = StyleSheet.create({
   detailsBox: {
@@ -61,50 +74,49 @@ const styles = StyleSheet.create({
     alignSelf: "center",
     padding: 30,
     marginBottom: 20,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
+  loadingContainer: {
+    flex: 1,
+    backgroundColor: "#FFF2D8",
+    justifyContent: "center",
+    alignItems: "center",
   },
   title: {
     color: "grey",
-    fontSize: 16,
+    fontSize: 14,
+    fontWeight: "bold",
+    marginBottom: 10,
   },
   amount: {
     fontSize: 24,
     fontWeight: "bold",
+    color: "black",
   },
   btn_div: {
     marginTop: 20,
-    flex: 1,
-    flexDirection: "row", // Use flexDirection to horizontally align the buttons
-    justifyContent: "space-evenly",
     alignItems: "center",
-    height: 50, // Specify a height for the container
   },
   deposit: {
-    width: "45%", // Adjust the width as needed
+    width: "100%",
     borderRadius: 16,
-    backgroundColor: "dodgerblue",
+    backgroundColor: "#000",
     paddingVertical: 16,
-    paddingHorizontal: 25,
-    color: "white",
-  },
-  withdraw: {
-    width: "45%", // Adjust the width as needed
-    borderRadius: 16,
-    borderWidth: 2,
-    borderColor: "dodgerblue",
-    backgroundColor: "transparent",
-    paddingVertical: 14,
-    paddingHorizontal: 25,
+    flexDirection: "row",
     justifyContent: "center",
+    alignItems: "center",
+  },
+  icon: {
+    marginRight: 10,
   },
   deposit_text: {
     color: "white",
-    textAlign: "center",
+    fontSize: 18,
   },
-  withdraw_text: {
-    color: "black",
-    textAlign: "center",
-  },
-  // ... Rest of your styles
 });
 
 export default SavingsComponent;

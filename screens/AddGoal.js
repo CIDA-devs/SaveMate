@@ -27,6 +27,7 @@ import {
   doc,
   updateDoc,
   getDoc,
+  orderBy,
 } from "firebase/firestore";
 
 const db = getFirestore(app);
@@ -88,20 +89,15 @@ const GoalScreen = ({ route, navigation }) => {
     }
 
     const unsubscribeFocus = navigation.addListener("focus", () => {
-      // The screen is focused
-      // Call any action
       if (isEdit) {
         populateFields();
       }
     });
 
     const unsubscribeBlur = navigation.addListener("blur", () => {
-      // The screen is unfocused
-      // Call any action
       resetFields();
     });
 
-    // Make sure to unsubscribe when you no longer need to listen to the event
     return () => {
       unsubscribeFocus();
       unsubscribeBlur();
@@ -172,12 +168,11 @@ const GoalScreen = ({ route, navigation }) => {
   const updateFirebaseAmount = async () => {
     const newFirebaseAmount = firebaseAmount - parseFloat(currentAmount);
 
-    // Ensure the new amount is not negative
     if (newFirebaseAmount >= 0) {
       try {
         const docRef = doc(db, "transactions", "transaction");
         await updateDoc(docRef, { amount: newFirebaseAmount });
-        setFirebaseAmount(newFirebaseAmount); // Update local state
+        setFirebaseAmount(newFirebaseAmount);
       } catch (error) {
         console.error("Error updating amount: ", error);
       }
@@ -188,7 +183,6 @@ const GoalScreen = ({ route, navigation }) => {
 
   const saveGoalToFirestore = async () => {
     try {
-      // Perform your validation checks
       if (parseFloat(currentAmount) > parseFloat(targetAmount)) {
         alert("Current amount cannot be higher than the targeted amount.");
         return;
@@ -217,20 +211,16 @@ const GoalScreen = ({ route, navigation }) => {
       let docRef;
 
       if (isEdit) {
-        // Update the existing document if in edit mode
         docRef = doc(db, "SaveMate", goalId);
         await updateDoc(docRef, goalData);
         console.log("Goal updated with ID: ", goalId);
         dispatch(updateGoal({ id: goalId, ...goalData }));
       } else {
-        // Create a new document if not in edit mode
         docRef = await addDoc(saveMateCollection, goalData);
         setGoalId(docRef.id);
         console.log("Goal saved with ID: ", docRef.id);
-        dispatch(addGoal({ id: docRef.id, ...goalData }));
       }
 
-      // Reset the form fields
       setGoalName("");
       setDescription("");
       setDate(new Date());
@@ -239,20 +229,18 @@ const GoalScreen = ({ route, navigation }) => {
       setCurrentAmount("");
       setSelectedImages([]);
 
-      // Navigate back to the "Recents" screen
-      navigation.navigate("Recents");
+      navigation.navigate("All Goals");
 
       console.log("Input fields reset.");
     } catch (error) {
       console.error("Error saving goal: ", error);
     }
     if (!isEdit) {
-      // Only update the Firebase amount if in "Add Goal" mode
       await updateFirebaseAmount();
     }
   };
   return (
-    <View>
+    <View style={styles.container2}>
       <ScrollView>
         <View style={styles.container}>
           <Text style={styles.heading}>
@@ -348,7 +336,7 @@ const GoalScreen = ({ route, navigation }) => {
             keyboardType="numeric"
             editable={!isEdit}
           />
-          {parseFloat(currentAmount) > firebaseAmount && ( // Compare currentAmount with firebaseAmount
+          {parseFloat(currentAmount) > firebaseAmount && (
             <TouchableOpacity>
               <Text style={styles.addFundsText}>
                 Insufficient Funds. Add Funds
@@ -373,7 +361,12 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     marginHorizontal: 20,
-    marginTop: 20,
+  },
+  container2: {
+    flex: 1,
+    marginHorizontal: 20,
+    marginTop: 70,
+    marginBottom: 50,
   },
   heading: {
     fontSize: 24,

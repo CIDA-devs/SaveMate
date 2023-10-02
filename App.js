@@ -14,6 +14,11 @@ import PaymentScreen from "./screens/PaymentScreen";
 import DepositScreen from "./screens/DepositScreen";
 import GoalDetails from "./screens/GoalDetails";
 
+import SuccessScreen from "./screens/SuccessScreen";
+import AddGoal from "./screens/AddGoal";
+import Withdraw from "./screens/Withdraw";
+import FinancialAI from "./screens/FinancialAI";
+
 const Stack = createStackNavigator();
 
 const App = () => {
@@ -108,6 +113,26 @@ const App = () => {
                 name="GoalDetails"
                 options={{ headerShown: false }}
                 component={GoalDetails}
+              />
+              <Stack.Screen
+                name="Success"
+                options={{ headerShown: false }}
+                component={SuccessScreen}
+              />
+              <Stack.Screen
+                name="GoalScreen"
+                options={{ headerShown: false }}
+                component={AddGoal}
+              />
+              <Stack.Screen
+                name="Withdraw"
+                options={{ headerShown: false }}
+                component={Withdraw}
+              />
+              <Stack.Screen
+                name="FinancialAI"
+                options={{ headerShown: false }}
+                component={FinancialAI}
               />
             </>
           )}

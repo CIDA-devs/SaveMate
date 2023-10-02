@@ -2,9 +2,7 @@ import React from "react";
 import { View, Text, Button } from "react-native";
 import { getAuth, signOut } from "firebase/auth";
 import { useNavigation } from "@react-navigation/native";
-import { PagesNavigator, MyBottomTabs } from "../components/PagesNavigator";
-import Home from "../components/MainContentData";
-import Notifications from "../components/Notifications";
+import { MyBottomTabs } from "../components/PagesNavigator";
 
 const HomeScreen = () => {
   const navigation = useNavigation();
@@ -13,7 +11,6 @@ const HomeScreen = () => {
   const handleLogout = () => {
     signOut(auth)
       .then(() => {
-        // Successfully logged out
         navigation.navigate("Login");
       })
       .catch((error) => {
@@ -22,10 +19,9 @@ const HomeScreen = () => {
   };
 
   return (
-    <View style={{ flex: 1 }}>
-      {/* <PagesNavigator/> */}
+    <View style={{ flex: 1, backgroundColor: "#FFF2D8" }}>
       <MyBottomTabs />
-      <Button title="Logout" onPress={handleLogout} />
+      <Button color="black" title="Logout" onPress={handleLogout} />
     </View>
   );
 };

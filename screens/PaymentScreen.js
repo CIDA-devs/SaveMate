@@ -8,30 +8,27 @@ import "../global";
 const PaystackPaymentScreen = () => {
   const navigation = useNavigation();
   const route = useRoute();
-  const { goalId, amount, email, isDeposit } = route.params; // Get email from route params
+  const { goalId, amount, email, isDeposit } = route.params;
   const paystackWebViewRef = useRef();
 
   useEffect(() => {
-    // Automatically start the Paystack transaction when the screen loads
     paystackWebViewRef.current.startTransaction();
   }, []);
 
   const handleSuccess = (res) => {
-    // TODO: Update the backend with the transaction details
-    // For now, just navigate back to the AddGoalScreen
     updateFirestoreWithDepositAmount(amount);
     navigation.navigate("Home");
   };
 
   const handleCancel = () => {
-    navigation.goBack(); // Navigate back to the previous screen
+    navigation.goBack();
   };
 
   return (
     <View style={styles.container}>
       <Paystack
         paystackKey="pk_test_0edda270529c6a7b50ef15242ef7c4d46bb17909"
-        billingEmail={email} // Use the email passed via navigation parameters
+        billingEmail={email}
         amount={amount}
         currency="GHS"
         onCancel={handleCancel}

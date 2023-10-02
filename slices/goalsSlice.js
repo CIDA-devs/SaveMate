@@ -20,6 +20,9 @@ const goalsSlice = createSlice({
     addGoal: (state, action) => {
       state.goals.push(action.payload);
     },
+    updateGoals: (state, action) => {
+      state.goals = action.payload;
+    },
     updateGoal: (state, action) => {
       const { id, ...updatedGoalData } = action.payload;
       const goalIndex = state.goals.findIndex((goal) => goal.id === id);
@@ -28,6 +31,14 @@ const goalsSlice = createSlice({
           ...state.goals[goalIndex],
           ...updatedGoalData,
         };
+      }
+    },
+    fundGoal: (state, action) => {
+      const { id, amount } = action.payload;
+      const goalIndex = state.goals.findIndex((goal) => goal.id === id);
+      if (goalIndex !== -1) {
+        state.goals[goalIndex].currentAmount =
+          parseFloat(state.goals[goalIndex].currentAmount) + amount;
       }
     },
   },
@@ -47,6 +58,7 @@ const goalsSlice = createSlice({
   },
 });
 
-export const { addGoal, updateGoal } = goalsSlice.actions;
+export const { addGoal, updateGoals, updateGoal, fundGoal } =
+  goalsSlice.actions;
 
 export default goalsSlice.reducer;

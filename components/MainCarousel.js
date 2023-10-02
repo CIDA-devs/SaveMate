@@ -4,10 +4,9 @@ import Carousel from "./Carousel";
 
 const App = () => {
   const data = [
-    { imageSource: require("../assets/give.jpg") }, // Replace with your image sources
+    { imageSource: require("../assets/give.jpg") },
     { imageSource: require("../assets/games.jpg") },
     { imageSource: require("../assets/laptop.jpg") },
-    // Add more items as needed
   ];
 
   return (

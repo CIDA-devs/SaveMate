@@ -8,23 +8,19 @@ const VerificationScreen = () => {
 
   useEffect(() => {
     const interval = setInterval(() => {
-      // Reload user to get updated emailVerified status
       reload(user).then(() => {
         if (user.emailVerified) {
-          clearInterval(interval); // Clear interval once email is verified
+          clearInterval(interval);
         }
       });
-    }, 5000); // Check every 5 seconds
+    }, 5000);
 
-    return () => clearInterval(interval); // Cleanup on component unmount
+    return () => clearInterval(interval);
   }, [user]);
 
   return (
     <View style={styles.container}>
-      <Image
-        source={require("../assets/verify.png")} // Replace with your image path
-        style={styles.image}
-      />
+      <Image source={require("../assets/verify.png")} style={styles.image} />
       <Text style={styles.input}>
         Please verify your email address. Check your inbox
       </Text>
